@@ -33,6 +33,8 @@ class Vehicle(models.Model):
         ('truck', 'Truck'),
         ('van', 'Van'),
         ('pickup', 'Pickup'),
+        ('plane', 'Plane'),
+        ('ship', 'Ship'),
     ]
     STATUS_CHOICES = [
         ('available', 'Available'),
@@ -69,6 +71,7 @@ class Shipment(models.Model):
         ('in_transit', 'In Transit'),
         ('completed', 'Completed'),
         ('cancelled', 'Cancelled'),
+        ('delayed', 'Delayed'),
     ]
 
     tracking_number = models.CharField(max_length=50, unique=True)

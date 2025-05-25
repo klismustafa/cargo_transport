@@ -1,0 +1,44 @@
+{% extends 'base.html' %}
+
+{% block title %}Welcome to Cargo Transport{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="row justify-content-center">
+        <div class="col-md-8 text-center">
+            <h1 class="display-4 mb-4">Welcome to Cargo Transport</h1>
+            <p class="lead mb-4">Track your shipments and manage your cargo transportation needs efficiently.</p>
+        </div>
+    </div>
+
+    <div class="row mt-4">
+        <div class="col-md-4">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">Track Shipment</h5>
+                    <p class="card-text">Track your shipment status and location in real-time.</p>
+                    <a href="{% url 'tracking' %}" class="btn btn-primary">Track Now</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">View Shipments</h5>
+                    <p class="card-text">See all your active and completed shipments.</p>
+                    <a href="{% url 'shipment-list' %}" class="btn btn-primary">View Shipments</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">Manage Cargo</h5>
+                    <p class="card-text">Manage your cargo and transportation needs.</p>
+                    <a href="{% url 'cargo-list' %}" class="btn btn-primary">Manage Cargo</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

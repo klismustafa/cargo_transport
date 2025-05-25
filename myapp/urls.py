@@ -6,8 +6,10 @@ from .views import (
     ShipmentListCreateView, ShipmentDetailView,
     CustomerListCreateView, CustomerDetailView
 )
+from . import views
 
 urlpatterns = [
+    path('', views.home_view, name='home'),  # Add this line for the home page
     path('cargos/', CargoListCreateView.as_view(), name='cargo-list'),
     path('cargos/<int:pk>/', CargoDetailView.as_view(), name='cargo-detail'),
     path('vehicles/', VehicleListCreateView.as_view(), name='vehicle-list'),
@@ -18,4 +20,6 @@ urlpatterns = [
     path('shipments/<int:pk>/', ShipmentDetailView.as_view(), name='shipment-detail'),
     path('customers/', CustomerListCreateView.as_view(), name='customer-list'),
     path('customers/<int:pk>/', CustomerDetailView.as_view(), name='customer-detail'),
+    path('tracking/', views.tracking_view, name='tracking'),
+    path('api/shipments/track/<str:tracking_number>/', views.track_shipment, name='track-shipment'),
 ]

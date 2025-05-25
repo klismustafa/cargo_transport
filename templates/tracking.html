@@ -1,0 +1,144 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Track Shipment{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="row mb-4">
+        <div class="col-md-6 mx-auto">
+            <div class="card">
+                <div class="card-body">
+                    <h3 class="card-title text-center">Track Your Shipment</h3>
+                    <form id="trackingForm" class="mt-4">
+                        <div class="form-group">
+                            <input type="text" class="form-control" id="trackingNumber" 
+                                   placeholder="Enter Tracking Number" required>
+                        </div>
+                        <button type="submit" class="btn btn-primary w-100 mt-3">Track</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="shipmentDetails" class="row" style="display: none;">
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-body">
+                    <h4>Shipment Information</h4>
+                    <div id="shipmentInfo" class="mt-3">
+                        <div class="status-timeline mb-4"></div>
+                        <div class="shipment-details"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-body">
+                    <div id="map" style="height: 400px;"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Add Google Maps JavaScript API -->
+<script src="https://maps.googleapis.com/maps/api/js?key=YOUR_API_KEY"></script>
+<script>
+let map;
+let marker;
+
+function initMap() {
+    map = new google.maps.Map(document.getElementById('map'), {
+        zoom: 4,
+        center: {lat: 0, lng: 0},
+        styles: [
+            // Add custom map styles here
+        ]
+    });
+}
+
+function formatStatus(status) {
+    return status.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
+}
+
+document.getElementById('trackingForm').addEventListener('submit', function(e) {
+    e.preventDefault();
+    const trackingNumber = document.getElementById('trackingNumber').value;
+    
+    fetch(`/api/shipments/track/${trackingNumber}/`)
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Shipment not found');
+            }
+            return response.json();
+        })
+        .then(data => {
+            document.getElementById('shipmentDetails').style.display = 'flex';
+            
+            // Update shipment info
+            const details = `
+                <div class="mb-3">
+                    <h5>Status: <span class="badge bg-primary">${formatStatus(data.status)}</span></h5>
+                </div>
+                <div class="shipment-info">
+                    <p><strong>Cargo:</strong> ${data.cargo_description}</p>
+                    <p><strong>Origin:</strong> ${data.origin}</p>
+                    <p><strong>Destination:</strong> ${data.destination}</p>
+                    <p><strong>Current Location:</strong> ${data.current_location || 'Updating...'}</p>
+                    <p><strong>Estimated Arrival:</strong> ${new Date(data.arrival_time).toLocaleString()}</p>
+                    <p><strong>Vehicle:</strong> ${data.vehicle_info}</p>
+                    <p><strong>Drivers:</strong> ${data.drivers.join(', ')}</p>
+                </div>
+            `;
+            document.querySelector('.shipment-details').innerHTML = details;
+
+            // Update map
+            if (data.current_location_coordinates) {
+                const position = {
+                    lat: data.current_location_coordinates.lat,
+                    lng: data.current_location_coordinates.lng
+                };
+                
+                if (!marker) {
+                    marker = new google.maps.Marker({
+                        position: position,
+                        map: map,
+                        title: `Shipment ${trackingNumber}`
+                    });
+                } else {
+                    marker.setPosition(position);
+                }
+                
+                map.setCenter(position);
+                map.setZoom(12);
+            }
+        })
+        .catch(error => {
+            alert('Error tracking shipment. Please check the tracking number.');
+        });
+});
+
+// Initialize map when page loads
+window.addEventListener('load', initMap);
+</script>
+
+<style>
+.status-timeline {
+    height: 4px;
+    background: #e9ecef;
+    position: relative;
+    margin: 20px 0;
+}
+
+.shipment-info p {
+    margin-bottom: 0.5rem;
+}
+
+.badge {
+    font-size: 1rem;
+}
+</style>
+{% endblock %}
